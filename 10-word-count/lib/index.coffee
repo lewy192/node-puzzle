@@ -8,6 +8,7 @@ module.exports = ->
   transform = (chunk, encoding, cb) ->
     tokens = chunk.split(' ')
     words = tokens.length
+    if chunk[0] == '"' || chunk[0] =="'" then words = 1
     return cb()
 
   flush = (cb) ->
