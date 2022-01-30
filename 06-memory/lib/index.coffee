@@ -1,20 +1,19 @@
 fs = require 'fs'
+readline = require 'readline'
 
 
 exports.countryIpCounter = (countryCode, cb) ->
   return cb() unless countryCode
+  counter = 0
+    # create read stream
+  fileStream = fs.createReadStream "#{__dirname}/../data/geo.txt"
+  fileStreamInterface = readline.createInterface { input: fileStream }
+  fileStreamInterface.on 'line', (line) -> 
+  # destructures the array created by splitting the line string
+    [start,end,_,ISOcode] = line.split '\t'
+    if ISOcode == countryCode then counter+= +end - +start 
+  fileStream.on 'end', () ->  cb null, counter
 
-  fs.readFile "#{__dirname}/../data/geo.txt", 'utf8', (err, data) ->
-    if err then return cb err
 
-    data = data.toString().split '\n'
-    counter = 0
-
-    for line in data when line
-      line = line.split '\t'
-      # GEO_FIELD_MIN, GEO_FIELD_MAX, GEO_FIELD_COUNTRY
-      # line[0],       line[1],       line[3]
-
-      if line[3] == countryCode then counter += +line[1] - +line[0]
-
-    cb null, counter
+#Acknowledgements: 
+# https://stackabuse.com/reading-a-file-line-by-line-in-node-js/
